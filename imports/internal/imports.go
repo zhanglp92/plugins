@@ -11,7 +11,11 @@ func init() {
 
 // Process ...
 func Process(data []byte) ([]byte, error) {
-	return imports.Process("", data, nil)
+	out, err := imports.RemoveImportSpaces(data)
+	if err != nil {
+		return data, err
+	}
+	return imports.Process("", out, nil)
 }
 
 func updateImportToGroupHandlers() {

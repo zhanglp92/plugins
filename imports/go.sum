@@ -1,6 +1,6 @@
 github.com/yuin/goldmark v1.4.0/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
-github.com/zhanglp92/tools v0.1.6-zlp-5 h1:b0rmMBhyk5WeXEroH56DrF5pYtgHIG57iYsAS9HtJVE=
-github.com/zhanglp92/tools v0.1.6-zlp-5/go.mod h1:LGqMHiF4EqQNHR1JncWGqT5BVaXmza+X+BDGol+dOxo=
+github.com/zhanglp92/tools v0.1.6-zlp-7 h1:MO2Z9BGrek/aI87oP3azM83KbjeUTR3vUUnIg6hvZJY=
+github.com/zhanglp92/tools v0.1.6-zlp-7/go.mod h1:LGqMHiF4EqQNHR1JncWGqT5BVaXmza+X+BDGol+dOxo=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/mod v0.4.2 h1:Gz96sIWK3OalVv/I/qNygP42zyoKp3xptRVCWRFEBvo=
