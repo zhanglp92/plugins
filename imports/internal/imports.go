@@ -15,7 +15,12 @@ func Process(data []byte) ([]byte, error) {
 	if err != nil {
 		return data, err
 	}
-	return imports.Process("", out, nil)
+	return imports.Process("", out, &imports.Options{
+		Comments:   true,
+		TabIndent:  true,
+		FormatOnly: true,
+		TabWidth:   8,
+	})
 }
 
 func updateImportToGroupHandlers() {
