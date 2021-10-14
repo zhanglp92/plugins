@@ -1,4 +1,4 @@
-package internal
+package imports
 
 import (
 	"golang.org/x/tools/imports"

@@ -15,8 +15,9 @@ import (
 )
 
 var (
-	writeToFile bool
-	_testing    bool
+	writeToFile   bool
+	updateComment bool
+	_testing      bool
 )
 
 func init() {
@@ -29,11 +30,12 @@ func init() {
 	}
 
 	flag.Usage = func() {
-		_, _ = fmt.Fprintf(os.Stderr, "Usage of %s:\n  %s [-wh] <file|dir>\n", os.Args[0], os.Args[0])
+		_, _ = fmt.Fprintf(os.Stderr, "Usage of %s:\n  %s [-whc] <file|dir>\n", os.Args[0], os.Args[0])
 		flag.PrintDefaults()
 	}
 
 	flag.BoolVar(&writeToFile, "w", false, "write result to (source) file instead of stdout")
+	flag.BoolVar(&updateComment, "c", false, "update comment to node")
 	flag.Parse()
 }
 
@@ -96,7 +98,7 @@ func processFile(filePath string) error {
 		return fmt.Errorf("unable to read data in file : %v", err)
 	}
 
-	newData, err := internal.Process(fileData)
+	newData, err := process(fileData)
 	if err != nil {
 		return fmt.Errorf("error while process file : %v", err)
 	}
@@ -125,11 +127,15 @@ func processRaw(in io.Reader, out io.Writer) error {
 		return err
 	}
 
-	res, err := internal.Process(src)
+	res, err := process(src)
 	if err != nil {
 		return err
 	}
 
 	_, err = out.Write(res)
 	return err
+}
+
+func process(src []byte) ([]byte, error) {
+	return internal.Process(src, updateComment)
 }
