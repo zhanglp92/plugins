@@ -60,6 +60,10 @@ func addDoc(f *ast.File) {
 }
 
 func updateDoc(node *updateDocNode) *ast.CommentGroup {
+	if node.Name == nil || len(node.Name.Name) <= 0 || (node.Name.Name[0] >= 'a' &&  node.Name.Name[0] <= 'z') {
+		return node.Doc
+	}
+
 	if node.Doc == nil || len(node.Doc.List) <= 0 {
 		return genDoc(node.Name)
 	}
