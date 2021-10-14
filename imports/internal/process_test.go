@@ -31,6 +31,7 @@ type Aaaa struct {
   Bb string // xxxx
 }
 
+//     Chec xx
 func (m*Aaaa) Check() {}
 
 //
@@ -41,7 +42,7 @@ func A() {}
 
 
 
-// bbb
+//     bbb
 func B() {}
 
 /*

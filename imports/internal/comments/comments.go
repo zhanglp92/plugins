@@ -79,9 +79,9 @@ func updateDoc(node *updateDocNode) *ast.CommentGroup {
 
 		invalidDocIdx = i
 		if needInsert(invalidPos, c) {
-			insertNameToDoc(node.Name.Name, c)
+			insertNameToDoc(invalidPos, node.Name.Name, c)
 		} else {
-			replaceNameToDoc(node.Name.Name, c)
+			replaceNameToDoc(invalidPos, node.Name.Name, c)
 		}
 	}
 
@@ -139,20 +139,17 @@ func getInvalidPos(c *ast.Comment) (int, bool) {
 	return -1, false
 }
 
-func replaceNameToDoc(name string, c *ast.Comment) {
-	idx := strings.Index(c.Text, "//")
-
-	suffixStart := strings.Index(strings.TrimSpace(c.Text[idx+2:]), " ")
-	if suffixStart < 0 {
-		c.Text = c.Text[:idx] + "// " + name
+func replaceNameToDoc(pos int, name string, c *ast.Comment) {
+	spaceIdx := strings.Index(strings.TrimSpace(c.Text[pos:]), " ")
+	if spaceIdx < 0 {
+		c.Text = strings.TrimSpace(c.Text[:pos]) + " " + name + " ..."
 	} else {
-		c.Text = c.Text[:idx] + "// " + name + c.Text[suffixStart:]
+		c.Text = strings.TrimSpace(c.Text[:pos]) + " " + name + c.Text[pos+spaceIdx:]
 	}
 }
 
-func insertNameToDoc(name string, c *ast.Comment) {
-	idx := strings.Index(c.Text, "//")
-	c.Text = c.Text[:idx] + "// " + name + " " + strings.TrimSpace(c.Text[idx+2:])
+func insertNameToDoc(pos int, name string, c *ast.Comment) {
+	c.Text = strings.TrimSpace(c.Text[:pos]) + " " + name + " " + c.Text[pos:]
 }
 
 func genDoc(name *ast.Ident) *ast.CommentGroup {
