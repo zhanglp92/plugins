@@ -6,6 +6,7 @@ import (
 	"go/parser"
 	"go/printer"
 	"go/token"
+	"strings"
 )
 
 // Process ...
@@ -53,40 +54,109 @@ func addDoc(f *ast.File) {
 	for _, decl := range f.Decls {
 		switch node := decl.(type) {
 		case *ast.FuncDecl:
-			node.Doc = addFuncDoc(&updateDocNode{Doc: node.Doc, Name: node.Name})
+			node.Doc = updateDoc(&updateDocNode{Doc: node.Doc, Name: node.Name})
 		}
 	}
 }
 
-func addFuncDoc(node *updateDocNode) *ast.CommentGroup {
-	if !needDoc(node.Doc, node.Name) {
-		return node.Doc
+func updateDoc(node *updateDocNode) *ast.CommentGroup {
+	if node.Doc == nil || len(node.Doc.List) <= 0 {
+		return genDoc(node.Name)
 	}
-	return genDoc(node.Name)
+
+	var invalidDocIdx = -1
+	for i, c := range node.Doc.List {
+		invalidPos, isSpace := getInvalidPos(c)
+
+		if isSpace {
+			continue
+		}
+
+		if invalidPos < 0 {
+			node.Doc.List = append(genDoc(node.Name).List, node.Doc.List...)
+			return node.Doc
+		}
+
+		invalidDocIdx = i
+		if needInsert(invalidPos, c) {
+			insertNameToDoc(node.Name.Name, c)
+		} else {
+			replaceNameToDoc(node.Name.Name, c)
+		}
+	}
+
+	if invalidDocIdx < 0 {
+		return genDoc(node.Name)
+	}
+
+	node.Doc.List = node.Doc.List[invalidDocIdx:]
+	return node.Doc
+}
+
+func needInsert(invalidPos int, c *ast.Comment) bool {
+	a := c.Text[invalidPos]
+	return a >= 'a' && a <= 'z'
+}
+
+func getInvalidPos(c *ast.Comment) (int, bool) {
+	var (
+		status  = 0
+		lineCnt = 0
+	)
+
+	for i, h := range c.Text {
+		if status == 0 {
+			if h == ' ' {
+				continue
+			} else {
+				status++
+			}
+		}
+
+		if status == 1 {
+			if h == '/' {
+				lineCnt++
+				continue
+			} else if lineCnt < 2 {
+				break
+			} else {
+				status++
+			}
+		}
+
+		if status == 2 {
+			if h == ' ' {
+				continue
+			} else {
+				return i, false
+			}
+		}
+	}
+
+	if (status == 1 && lineCnt >= 2) || status == 2 {
+		return -1, true
+	}
+	return -1, false
+}
+
+func replaceNameToDoc(name string, c *ast.Comment) {
+	idx := strings.Index(c.Text, "//")
+
+	suffixStart := strings.Index(strings.TrimSpace(c.Text[idx+2:]), " ")
+	if suffixStart < 0 {
+		c.Text = c.Text[:idx] + "// " + name
+	} else {
+		c.Text = c.Text[:idx] + "// " + name + c.Text[suffixStart:]
+	}
+}
+
+func insertNameToDoc(name string, c *ast.Comment) {
+	idx := strings.Index(c.Text, "//")
+	c.Text = c.Text[:idx] + "// " + name + " " + strings.TrimSpace(c.Text[idx+2:])
 }
 
 func genDoc(name *ast.Ident) *ast.CommentGroup {
 	return &ast.CommentGroup{
 		List: []*ast.Comment{{Text: "// " + name.Name + " ..."}},
 	}
-}
-
-func needDoc(doc *ast.CommentGroup, name *ast.Ident) bool {
-	if hasDoc(doc) {
-		return false
-	}
-
-	if name == nil || len(name.Name) <= 0 {
-		return false
-	}
-
-	if c := name.Name[0]; c < 'A' || c > 'Z' {
-		return false
-	}
-
-	return true
-}
-
-func hasDoc(doc *ast.CommentGroup) bool {
-	return doc != nil && len(doc.List) > 0
 }

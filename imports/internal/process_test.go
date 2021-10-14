@@ -33,13 +33,29 @@ type Aaaa struct {
 
 func (m*Aaaa) Check() {}
 
+//
+//
+//
 func A() {}
 
 
 
 
-// Bbb
+// bbb
 func B() {}
+
+/*
+cdfas
+*/
+func C() {}
+
+//
+        // dddd
+//
+func D() {}
+
+
+
 
 func main() {
 	Ax := func() {}
